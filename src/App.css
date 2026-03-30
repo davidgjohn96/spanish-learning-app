@@ -1,0 +1,271 @@
+.appShell {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  gap: 16px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topBarRight {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.linkButton {
+  background: transparent;
+  border: 0;
+  color: var(--text-h);
+  font-weight: 650;
+  font-size: 18px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  background: var(--social-bg);
+}
+
+.pill {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-h);
+}
+
+.main {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.footer {
+  padding: 8px 2px 0;
+}
+
+.card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg) 92%, var(--social-bg));
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  letter-spacing: -0.6px;
+}
+
+.h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.lead {
+  margin: 0 0 16px;
+}
+
+.muted {
+  color: var(--text);
+}
+
+.small {
+  font-size: 13px;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.primary,
+.secondary,
+.grade {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-h);
+  background: var(--bg);
+}
+
+.primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
+}
+
+.primary:hover {
+  filter: brightness(1.05);
+}
+
+.secondary {
+  background: var(--social-bg);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.dialogue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.revealLine {
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.revealTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.revealBottom {
+  margin-top: 8px;
+}
+
+.tag {
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  padding: 2px 8px;
+  border-radius: 999px;
+  align-self: flex-start;
+  flex: 0 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chunkCard {
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.chunkEs {
+  font-weight: 700;
+  color: var(--text-h);
+  margin-bottom: 6px;
+}
+
+.chunkMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.chunkEn {
+  margin-top: 10px;
+  font-family: var(--mono);
+}
+
+.prompt {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--bg);
+  margin-bottom: 12px;
+}
+
+.promptText {
+  margin-top: 6px;
+  font-size: 20px;
+  color: var(--text-h);
+}
+
+.inputLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.textInput {
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 16px;
+}
+
+.answerBox {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--bg);
+  margin: 12px 0;
+}
+
+.answerText {
+  margin-top: 6px;
+  font-size: 20px;
+}
+
+.grade {
+  padding: 10px 10px;
+}
+
+.grade.bad {
+  background: color-mix(in oklab, #ef4444 20%, var(--bg));
+}
+.grade.ok {
+  background: color-mix(in oklab, #f59e0b 20%, var(--bg));
+}
+.grade.good {
+  background: color-mix(in oklab, #10b981 20%, var(--bg));
+}
+.grade.great {
+  background: color-mix(in oklab, #22c55e 28%, var(--bg));
+}
