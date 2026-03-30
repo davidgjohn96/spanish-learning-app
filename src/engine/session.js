@@ -1,4 +1,4 @@
-import { getProfile, setProfile } from './profile.js'
+import { getProfile, recordDailyActivity, setProfile } from './profile.js'
 
 function nowMs() {
   return Date.now()
@@ -22,6 +22,11 @@ export function runLesson(lesson) {
     }
   }
 
+  if (!profile.completedLessonIds.includes(lesson.id)) {
+    profile.completedLessonIds.push(lesson.id)
+  }
+
+  recordDailyActivity(profile)
   setProfile(profile)
 }
 
@@ -59,6 +64,7 @@ export function gradeCard(cardId, grade) {
     card.state = 'learning'
     card.intervalDays = 0
     card.dueAt = t + 10 * 60 * 1000
+    recordDailyActivity(profile)
     setProfile(profile)
     return
   }
@@ -76,6 +82,7 @@ export function gradeCard(cardId, grade) {
   card.state = 'review'
   card.dueAt = t + daysToMs(card.intervalDays)
 
+  recordDailyActivity(profile)
   setProfile(profile)
 }
 

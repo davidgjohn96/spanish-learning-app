@@ -13,6 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .topBarRight {
@@ -117,8 +119,14 @@
   color: #fff;
 }
 
-.primary:hover {
+.primary:hover:not(:disabled) {
   filter: brightness(1.05);
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
 }
 
 .secondary {
@@ -268,4 +276,187 @@
 }
 .grade.great {
   background: color-mix(in oklab, #22c55e 28%, var(--bg));
+}
+
+.homeStack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardTight {
+  padding-bottom: 16px;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 720px) {
+  .statGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--bg);
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-h);
+  line-height: 1.1;
+}
+
+.statLabel {
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.rowSpaced {
+  margin-top: 4px;
+}
+
+.langPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+.langChip {
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--social-bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.langChip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.langChipActive {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--text-h);
+}
+
+.langSoon {
+  font-size: 11px;
+  color: var(--text);
+}
+
+.lessonHint {
+  margin: 0 0 12px;
+}
+
+.lessonList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.lessonMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lessonTitle {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.lessonBtn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.tagMuted {
+  color: var(--text);
+  background: var(--social-bg);
+  border-color: var(--border);
+}
+
+.tagDone {
+  color: #15803d;
+  background: color-mix(in oklab, #22c55e 18%, var(--bg));
+  border-color: color-mix(in oklab, #22c55e 35%, var(--border));
+}
+
+.tagOpen {
+  color: var(--accent);
+}
+
+.lessonHeader {
+  margin-bottom: 8px;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.rowGrades {
+  margin-top: 8px;
+}
+
+.checkFeedback {
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.checkOk {
+  background: color-mix(in oklab, #22c55e 18%, var(--bg));
+  border: 1px solid color-mix(in oklab, #22c55e 40%, var(--border));
+  color: var(--text-h);
+}
+
+.checkNo {
+  background: color-mix(in oklab, #f59e0b 16%, var(--bg));
+  border: 1px solid color-mix(in oklab, #f59e0b 35%, var(--border));
+  color: var(--text-h);
 }
