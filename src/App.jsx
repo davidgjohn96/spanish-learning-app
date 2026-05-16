@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 import { spanishLessons, getSpanishLessonById } from './content/es/index.js'
 import {
@@ -57,6 +58,7 @@ function App() {
           Progress is stored in your browser (localStorage).
         </span>
       </footer>
+      <Analytics />
     </div>
   )
 }
