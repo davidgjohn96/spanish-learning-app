@@ -45,6 +45,9 @@ function App() {
           <Review
             onDone={() => setRoute({ name: 'home' })}
             onBack={() => setRoute({ name: 'home' })}
+            onOpenLesson={(lessonId) =>
+              setRoute({ name: 'lesson', lessonId })
+            }
           />
         ) : null}
       </main>
@@ -246,25 +249,38 @@ function Lesson({ lessonId, onBack, onDone }) {
             onDone()
           }}
         >
-          Add these to my review
+          Finish lesson →
         </button>
       </div>
     </section>
   )
 }
 
-function Review({ onDone, onBack }) {
+function Review({ onDone, onBack, onOpenLesson }) {
   const [queueTick, setQueueTick] = useState(0)
   const queue = useMemo(() => getReviewQueue(), [queueTick])
   const current = queue[0]
+  const stats = useProgressStats()
 
   if (!current) {
+    const nextLesson = spanishLessons.find(
+      (l) => !stats.completedLessonIds.includes(l.id),
+    )
+
     return (
       <section className="card">
         <h1 className="h1">Review</h1>
         <p className="lead">You’re all caught up. Nice.</p>
-        <div className="row">
-          <button className="primary" onClick={onDone}>
+        <div className="row rowSpaced">
+          {nextLesson ? (
+            <button
+              className="primary"
+              onClick={() => onOpenLesson(nextLesson.id)}
+            >
+              Start: {nextLesson.title} →
+            </button>
+          ) : null}
+          <button className="secondary" onClick={onDone}>
             Home
           </button>
         </div>
