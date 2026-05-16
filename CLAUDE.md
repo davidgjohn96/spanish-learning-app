@@ -22,10 +22,11 @@ There is no test runner configured.
 
 The codebase deliberately splits **learning engine** from **language content** so additional languages can be added without rewriting core logic.
 
-- `src/engine/` — pure JS, no React. Owns SRS scheduling, profile shape, persistence, and the review/lesson flow.
+- `src/engine/` — pure JS, no React. Owns SRS scheduling, profile shape, persistence, auth, and the local↔server sync layer.
 - `src/content/<lang>/` — plain-data lesson modules (dialogue lines + chunks). Currently only `es/`. `src/content/es/index.js` exports an ordered `spanishLessons` array — lesson order in that array defines the unlock sequence.
 - `src/App.jsx` — single-file UI with a tiny `route` state machine (`home` | `lesson` | `review`). No router library.
-- `src/hooks/useProfileSync.js` — bridges the engine to React.
+- `src/hooks/useProfileSync.js` + `src/hooks/useAuth.js` — bridge the engine's pub/sub stores to React.
+- `supabase/schema.sql` — DDL to paste into the Supabase SQL editor.
 
 ### Profile + persistence
 
@@ -73,3 +74,27 @@ Keep the algorithm here readable over clever — the product preference is small
 ## Adding a new language
 
 The UI hints at this (`LANGUAGES` in `App.jsx` with `enabled: false` for fr/de/ja). Doing it properly is more than flipping the flag: `App.jsx`, `profile.js`, and `session.js` currently import `spanishLessons` directly. A real multi-language switch needs a content registry keyed by `activeLanguage` and per-language card namespaces — flag this before implementing.
+
+## Auth + server sync (Supabase)
+
+Sign-in is **anonymous-first**: visitors can use the app immediately, and only sign in (magic link, no password) when they want to save progress across devices. localStorage stays canonical for the current session; Supabase Postgres is canonical across devices.
+
+- `src/engine/supabase.js` — single-client wrapper. Returns `null` if `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` are missing, so dev works without env vars (the app silently runs in local-only mode).
+- `src/engine/auth.js` — session state + pub/sub (`subscribeAuth`/`getAuthVersion`), `signInWithEmail`, `signOut`. `initAuth` is idempotent and called once from `useAuth`.
+- `src/engine/sync.js` — pull/push/merge. `startBackgroundSync()` runs once at module load and subscribes to `subscribeProfile`, so every profile mutation triggers a debounced push (500ms) when the user is signed in.
+- `src/hooks/useAuth.js` — bridges auth state to React via `useSyncExternalStore`, kicks `initAuth()` once on mount.
+
+**Merge rule (on sign-in, runs once):**
+- Profile-level: streak = `max(local, server)`, `lastActivityDate` = latest, `completedLessonIds` = union, `activeLanguage` from server if present.
+- Per-card: latest `last_reviewed_at` wins. Local cards without `addedAt` (never put into rotation) are ignored.
+- Server cards always overwrite if local has no `addedAt` for that id.
+
+**Push rule (after sign-in):** debounced full-profile upsert on every change. Cards without `addedAt` are not pushed (they're just seeded chunks, not in rotation).
+
+**Circular import note:** `auth.js` and `sync.js` import from each other. This is safe because neither side calls the other during module initialization — both invocations happen later via callbacks. Live ESM bindings handle the rest.
+
+**Schema:** see [supabase/schema.sql](supabase/schema.sql). Two tables (`profiles`, `cards`), RLS policies restricting every row to `auth.uid() = user_id`. Card *content* (es/en/note) is **not** stored server-side — only the chunk id + SRS state. Content is bundled in the front-end and joined client-side.
+
+**Env vars:** `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the publishable / anon key, not the secret/service-role key). Anon key is safe in the front-end bundle because RLS gates row access at the database level. Secret key must NEVER be in env vars with `VITE_` prefix, in committed files, or in any front-end code — it bypasses RLS.
+
+**Email deliverability:** Supabase's built-in email service is rate-limited to ~4/hr per project and is for testing only. Before sending magic links to real users, configure a real SMTP provider (Resend, Postmark) in the Supabase dashboard → Auth → SMTP.

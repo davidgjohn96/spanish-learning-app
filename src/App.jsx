@@ -9,7 +9,15 @@ import {
 } from './engine/profile.js'
 import { answersMatch } from './engine/answerCheck.js'
 import { getReviewQueue, gradeCard, runLesson } from './engine/session.js'
+import { signInWithEmail, signOut } from './engine/auth.js'
+import { isSupabaseConfigured } from './engine/supabase.js'
+import { startBackgroundSync } from './engine/sync.js'
 import { useProgressStats } from './hooks/useProfileSync.js'
+import { useAuth } from './hooks/useAuth.js'
+
+// Start once at module load. Safe to call before auth is initialized —
+// it only pushes when there's a signed-in user.
+startBackgroundSync()
 
 function App() {
   const [route, setRoute] = useState({ name: 'home' })
@@ -23,7 +31,10 @@ function App() {
         >
           Habla
         </button>
-        <LanguagePicker />
+        <div className="topBarRight">
+          <LanguagePicker />
+          <AuthButton />
+        </div>
       </header>
 
       <main className="main">
@@ -71,6 +82,130 @@ const LANGUAGES = [
   { code: 'de', label: 'Deutsch', enabled: false },
   { code: 'ja', label: '日本語', enabled: false },
 ]
+
+function AuthButton() {
+  const { user, ready } = useAuth()
+  const [modalOpen, setModalOpen] = useState(false)
+
+  if (!isSupabaseConfigured()) return null
+  if (!ready) return <span className="muted small">…</span>
+
+  if (user) {
+    return (
+      <div className="authMenu">
+        <span className="muted small authEmail" title={user.email}>
+          {user.email}
+        </span>
+        <button
+          type="button"
+          className="linkButton linkButtonSmall"
+          onClick={() => signOut()}
+        >
+          Sign out
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="secondary authSignInBtn"
+        onClick={() => setModalOpen(true)}
+      >
+        Sign in
+      </button>
+      {modalOpen ? <SignInModal onClose={() => setModalOpen(false)} /> : null}
+    </>
+  )
+}
+
+function SignInModal({ onClose }) {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [error, setError] = useState('')
+
+  const submit = async (e) => {
+    e.preventDefault()
+    if (!email.trim()) return
+    setStatus('sending')
+    setError('')
+    try {
+      await signInWithEmail(email.trim())
+      setStatus('sent')
+    } catch (err) {
+      setError(err?.message ?? 'Something went wrong. Try again.')
+      setStatus('error')
+    }
+  }
+
+  return (
+    <div
+      className="modalBackdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h2 className="h2">Save your progress</h2>
+
+        {status === 'sent' ? (
+          <>
+            <p className="lead">
+              Check <strong>{email}</strong> for a sign-in link. Open it on
+              this device.
+            </p>
+            <button type="button" className="primary" onClick={onClose}>
+              Got it
+            </button>
+          </>
+        ) : (
+          <form onSubmit={submit}>
+            <p className="muted small modalHint">
+              We’ll email you a one-tap sign-in link. No password. Your
+              existing local progress will merge into your account on first
+              sign-in.
+            </p>
+            <label className="inputLabel">
+              <span className="muted small">Email</span>
+              <input
+                className="textInput"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+                disabled={status === 'sending'}
+              />
+            </label>
+            <div className="row rowSpaced">
+              <button
+                type="submit"
+                className="primary"
+                disabled={status === 'sending' || !email.trim()}
+              >
+                {status === 'sending' ? 'Sending…' : 'Send sign-in link'}
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                onClick={onClose}
+                disabled={status === 'sending'}
+              >
+                Cancel
+              </button>
+            </div>
+            {status === 'error' ? (
+              <div className="checkFeedback checkNo modalError">{error}</div>
+            ) : null}
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
 
 function LanguagePicker() {
   const stats = useProgressStats()
